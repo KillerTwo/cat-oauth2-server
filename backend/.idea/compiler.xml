@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="core" />
+        <module name="system" />
+        <module name="common" />
+        <module name="quartz" />
+        <module name="logging" />
+        <module name="generator" />
+      </profile>
+      <profile name="Annotation profile for cat-oauth2-server" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/opt/maven-3.8/repo/com/github/therapi/therapi-runtime-javadoc-scribe/0.13.0/therapi-runtime-javadoc-scribe-0.13.0.jar" />
+          <entry name="$USER_HOME$/opt/maven-3.8/repo/com/github/therapi/therapi-runtime-javadoc/0.13.0/therapi-runtime-javadoc-0.13.0.jar" />
+        </processorPath>
+        <module name="web-api" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="common" options="-parameters" />
+      <module name="core" options="-parameters" />
+      <module name="generator" options="-parameters" />
+      <module name="logging" options="-parameters" />
+      <module name="quartz" options="-parameters" />
+      <module name="system" options="-parameters" />
+      <module name="web-api" options="-parameters" />
+    </option>
+  </component>
+</project>
