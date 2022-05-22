@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "gen",
+      "type": "org.wm.config.GenConfig",
+      "sourceType": "org.wm.config.GenConfig"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

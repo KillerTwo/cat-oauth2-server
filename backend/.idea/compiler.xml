@@ -2,18 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="core" />
-        <module name="system" />
-        <module name="common" />
-        <module name="quartz" />
-        <module name="logging" />
-        <module name="generator" />
+        <module name="boogle-system" />
+        <module name="boogle-core" />
+        <module name="boogle-oauth2-server" />
+        <module name="boogle-logging" />
+        <module name="boogle-common" />
+        <module name="boogle-generator" />
+        <module name="boogle-quartz" />
       </profile>
-      <profile name="Annotation profile for cat-oauth2-server" enabled="true">
+      <profile name="Annotation profile for 统一认证服务" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -21,19 +23,20 @@
           <entry name="$USER_HOME$/opt/maven-3.8/repo/com/github/therapi/therapi-runtime-javadoc-scribe/0.13.0/therapi-runtime-javadoc-scribe-0.13.0.jar" />
           <entry name="$USER_HOME$/opt/maven-3.8/repo/com/github/therapi/therapi-runtime-javadoc/0.13.0/therapi-runtime-javadoc-0.13.0.jar" />
         </processorPath>
-        <module name="web-api" />
+        <module name="boogle-web-starter" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="common" options="-parameters" />
-      <module name="core" options="-parameters" />
-      <module name="generator" options="-parameters" />
-      <module name="logging" options="-parameters" />
-      <module name="quartz" options="-parameters" />
-      <module name="system" options="-parameters" />
-      <module name="web-api" options="-parameters" />
+      <module name="boogle-common" options="-parameters" />
+      <module name="boogle-core" options="-parameters" />
+      <module name="boogle-generator" options="-parameters" />
+      <module name="boogle-logging" options="-parameters" />
+      <module name="boogle-oauth2-server" options="-parameters" />
+      <module name="boogle-quartz" options="-parameters" />
+      <module name="boogle-system" options="-parameters" />
+      <module name="boogle-web-starter" options="-parameters" />
     </option>
   </component>
 </project>

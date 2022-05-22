@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  main:
+    allow-circular-references: true
+  thymeleaf:
+    cache: false
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          test:
+#            provider: spring
+#        provider:
+#          spring:
+#            issuer-uri:

@@ -1,11 +1,12 @@
 <p align="center">
 	<img alt="logo" style="border-radius: 20px; width: 60px" src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/logo/6.jpg">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">XunLU v2022.04.10</h1>
-<h4 align="center">基于SpringBoot+React前后端分离的Java快速开发框架</h4>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">cat-oauth2-server v2022.05.22</h1>
+<h4 align="center">oauth2 统一认证服务平台</h4>
 <p align="center">
-	<a href="https://github.com/KillerTwo/we-master/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
+	<a href="https://github.com/KillerTwo/cat-oauth2-server/LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg"></a>
 </p>
+
 
 ## 平台简介
 
@@ -36,31 +37,11 @@
 
 ## 在线体验
 
-- admin/admin123
 
-演示地址：http://110.40.159.200/welcome
+
+演示地址：
 
 ## 演示图
 
 <table>
-    <tr>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.32.11.png"/></td>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.35.06.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.32.11.png"/></td>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.33.36.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.33.59.png"/></td>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.34.23.png"/></td>
-    </tr>
-	<tr>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.34.43.png"/></td>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.39.12.png"/></td>
-    </tr>	 
-    <tr>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.40.06.png"/></td>
-        <td><img src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/home/%E6%88%AA%E5%B1%8F2022-04-10%2015.41.39.png"/></td>
-    </tr>
 </table>
