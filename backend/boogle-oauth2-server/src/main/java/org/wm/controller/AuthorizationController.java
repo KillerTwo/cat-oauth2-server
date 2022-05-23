@@ -15,10 +15,15 @@
  */
 package org.wm.controller;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.wm.utils.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Joe Grandja
  * @since 0.0.1
@@ -29,7 +34,16 @@ public class AuthorizationController {
 
 
 	@GetMapping(value = "/login")
-	public String authorizationCodeGrant(Model model) {
+	public String authorizationCodeGrant(Model model, HttpServletRequest request) {
+		// var err = model.getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+		var error = request.getSession().getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+		if (StringUtils.isNotNull(error)) {
+			if(UsernameNotFoundException.class.isAssignableFrom(error.getClass()) && ((UsernameNotFoundException) error).getMessage().equals("validate code error")) {
+				model.addAttribute("error", "验证码错误");
+			} else {
+				model.addAttribute("error", "用户名或密码错误");
+			}
+		}
 		return "loginPage";
 	}
 }

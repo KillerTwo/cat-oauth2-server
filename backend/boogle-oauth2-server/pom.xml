@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>boogle-oauth2-server</artifactId>
+    <name>统一认证授权服务模块</name>
 
     <dependencies>
         <dependency>
@@ -27,6 +28,10 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>whatwg-fetch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>bootstrap-icons</artifactId>
         </dependency>
     </dependencies>
 

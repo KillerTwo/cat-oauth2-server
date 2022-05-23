@@ -97,10 +97,13 @@
 </head>
 <body class="text-center">
 <main class="form-signin w-100 m-auto">
-    <form id="loginForm" action="/oauth2/doLogin" method="post">
-        <img class="mb-4" th:src="@{/webjars/bootstrap/assets/brand/bootstrap-logo.svg}" alt="" width="72" height="57">
-        <h1 class="h3 mb-3 fw-normal">登录</h1>
 
+    <form id="loginForm" action="/oauth2/doLogin" method="post">
+        <img class="mb-4" th:src="@{/webjars/bootstrap-icons/icons/bootstrap-fill.svg}" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal">登录</h1>
+        <input type="hidden" name="uuid" id="uuid" value="">
+
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
         <div class="form-floating">
             <input type="text" class="form-control" id="username" name="username" placeholder="name@example.com">
             <label for="username">用户名</label>
@@ -108,6 +111,11 @@
         <div class="form-floating">
             <input type="password" class="form-control" id="password" name="password" placeholder="Password">
             <label for="password">密码</label>
+        </div>
+        <div class="form-floating input-group">
+            <input type="text" class="form-control" id="code" name="code">
+            <img src="" class="rounded mx-auto float-end input-group-text" id="captchaImg" style="cursor: pointer;width: 100px;" alt="...">
+            <label for="code">验证码</label>
         </div>
 
         <div class="checkbox mb-3">
@@ -121,9 +129,27 @@
 </main>
 
 <script src="/webjars/bootstrap/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-<script src="/webjars/whatwg-fetch/fetch.js" th:src="@{/webjars/webjars/whatwg-fetch/fetch.js}"></script>
+<script src="/webjars/whatwg-fetch/fetch.js" th:src="@{/webjars/whatwg-fetch/fetch.js}"></script>
 <script>
+    const img = document.getElementById("captchaImg");
+    function getCaptchaImage(img) {
+        fetch("/captchaImage")
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === 200) {
+                    document.getElementById("uuid").value = data.data.uuid;
+                    const src = data.data.img;
+                    img.setAttribute("src", "data:image/jpg;base64," + src);
+                } else {
 
+                }
+            })
+    }
+    getCaptchaImage(img);
+
+    img.addEventListener('click', () => {
+        getCaptchaImage(img);
+    })
 </script>
 </body>
 </html>

@@ -48,11 +48,13 @@ import org.springframework.security.oauth2.server.authorization.config.ProviderS
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.wm.authentication.filter.JwtAuthenticationTokenFilter;
+import org.wm.authentication.filter.OAuth2UsernameLoginFilter;
 import org.wm.authentication.handler.OAuth2LoginSuccessHandler;
 import org.wm.jose.Jwks;
 
@@ -102,24 +104,42 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 				.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 				.apply(authorizationServerConfigurer);
 		http.formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer.loginPage("/oauth2/login"))
-				.addFilterBefore(usernamePasswordAuthenticationFilter(), BasicAuthenticationFilter.class);
+				.addFilterBefore(oAuth2UsernameLoginFilter(), BasicAuthenticationFilter.class);
 		// http.formLogin(Customizer.withDefaults()); //.addFilterBefore(usernamePasswordAuthenticationFilter(), JwtAuthenticationTokenFilter.class);
 
 		// http.addFilterBefore(usernamePasswordAuthenticationFilter(), JwtAuthenticationTokenFilter.class);
 	}
 
-	@Bean
+	// @Bean
 	public UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter() {
 		var usernamePasswordAuthenticationFilter = new UsernamePasswordAuthenticationFilter();
 		usernamePasswordAuthenticationFilter.setFilterProcessesUrl("/oauth2/doLogin");
 		usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager);
 		usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(savedRequestAwareAuthenticationSuccessHandler());
+		usernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(simpleUrlAuthenticationFailureHandler());
 		return usernamePasswordAuthenticationFilter;
+	}
+
+	@Bean
+	public OAuth2UsernameLoginFilter oAuth2UsernameLoginFilter() {
+		var oAuth2UsernameLoginFilter = new OAuth2UsernameLoginFilter();
+		oAuth2UsernameLoginFilter.setFilterProcessesUrl("/oauth2/doLogin");
+		oAuth2UsernameLoginFilter.setAuthenticationManager(authenticationManager);
+		oAuth2UsernameLoginFilter.setAuthenticationSuccessHandler(savedRequestAwareAuthenticationSuccessHandler());
+		oAuth2UsernameLoginFilter.setAuthenticationFailureHandler(simpleUrlAuthenticationFailureHandler());
+		return oAuth2UsernameLoginFilter;
 	}
 
 	// @Bean
 	public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler() {
 		return new OAuth2LoginSuccessHandler();
+	}
+
+	@Bean
+	public SimpleUrlAuthenticationFailureHandler simpleUrlAuthenticationFailureHandler() {
+		var failureHandler = new SimpleUrlAuthenticationFailureHandler();
+		failureHandler.setDefaultFailureUrl("/oauth2/login?error=");
+		return failureHandler;
 	}
 
 	@Bean
