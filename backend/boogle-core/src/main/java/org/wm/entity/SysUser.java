@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 /**
@@ -11,6 +13,8 @@ import lombok.Data;
  * @创建时间 2022/1/25
  * @描述 用户对象 sys_user
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class SysUser extends BaseEntity {
     private static final long serialVersionUID = 1L;

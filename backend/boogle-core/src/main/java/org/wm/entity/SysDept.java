@@ -1,5 +1,6 @@
 package org.wm.entity;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
  * @创建时间 2022/1/25
  * @描述 部门表 sys_dept
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
 @Data
 public class SysDept extends BaseEntity {
     private static final long serialVersionUID = 1L;

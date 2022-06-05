@@ -566,6 +566,7 @@ const Generator: React.FC = () => {
               <EditTable
                 values={tableColumn}
                 onChange={(values) => {
+                  console.log('保存数据：', values);
                   setTableColumns(values);
                 }}
               />

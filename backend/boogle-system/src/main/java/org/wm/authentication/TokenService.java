@@ -64,10 +64,10 @@ public class TokenService {
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
                 String userKey = getTokenKey(uuid);
-                JSONObject object = redisCache.getCacheObject(userKey);
-                String s = JSON.toJSONString(object);
-                // LoginUser user = redisCache.getCacheObject(userKey);
-                LoginUser user = JSON.parseObject(s, LoginUser.class);
+                // JSONObject object = redisCache.getCacheObject(userKey);
+                // String s = JSON.toJSONString(object);
+                LoginUser user = redisCache.getCacheObject(userKey);
+                // LoginUser user = JSON.parseObject(s, LoginUser.class);
                 return user;
             } catch (Exception e) {
                 throw new ServiceException(e.getMessage());

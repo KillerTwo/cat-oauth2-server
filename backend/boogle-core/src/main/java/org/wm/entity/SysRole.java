@@ -1,6 +1,8 @@
 package org.wm.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 /**
@@ -8,6 +10,8 @@ import lombok.Data;
  * @创建时间 2022/1/25
  * @描述 角色表 sys_role
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class SysRole extends BaseEntity {
     private static final long serialVersionUID = 1L;

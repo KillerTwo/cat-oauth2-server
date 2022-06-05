@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
@@ -36,11 +37,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.*;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
@@ -52,6 +51,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.savedrequest.CookieRequestCache;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.wm.authentication.filter.JwtAuthenticationTokenFilter;
 import org.wm.authentication.filter.OAuth2UsernameLoginFilter;
@@ -74,6 +75,9 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
 	/*@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -91,8 +95,26 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 				.authorizationEndpoint(authorizationEndpoint ->
 						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*/
 
+//		authorizationServerConfigurer.tokenGenerator(context -> {
+//			var tokenType = context.getTokenType();
+//
+//		});
+
+
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer
 				.getEndpointsMatcher();
+
+		/*http.requestCache(httpSecurityRequestCacheConfigurer -> {
+			httpSecurityRequestCacheConfigurer.requestCache(redisRequestCache());
+		});*/
+
+		/*http.securityContext(s -> {
+			s.securityContextRepository()
+		});*/
+
+		/*http.sessionManagement(s -> {
+
+		});*/
 
 		http.oauth2ResourceServer(oauth2Configurer ->
 				oauth2Configurer.jwt(jwtConfigurer -> jwtConfigurer.decoder(OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource()))));
@@ -125,14 +147,16 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		var oAuth2UsernameLoginFilter = new OAuth2UsernameLoginFilter();
 		oAuth2UsernameLoginFilter.setFilterProcessesUrl("/oauth2/doLogin");
 		oAuth2UsernameLoginFilter.setAuthenticationManager(authenticationManager);
-		oAuth2UsernameLoginFilter.setAuthenticationSuccessHandler(savedRequestAwareAuthenticationSuccessHandler());
+		oAuth2UsernameLoginFilter.setAuthenticationSuccessHandler(oAuth2LoginSuccessHandler());
 		oAuth2UsernameLoginFilter.setAuthenticationFailureHandler(simpleUrlAuthenticationFailureHandler());
 		return oAuth2UsernameLoginFilter;
 	}
 
-	// @Bean
+	@Bean
 	public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler() {
-		return new OAuth2LoginSuccessHandler();
+		var successHandler = new OAuth2LoginSuccessHandler();
+		// successHandler.setRequestCache(redisRequestCache());
+		return successHandler;
 	}
 
 	@Bean
@@ -142,9 +166,21 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		return failureHandler;
 	}
 
-	@Bean
+	// @Bean
 	public SavedRequestAwareAuthenticationSuccessHandler savedRequestAwareAuthenticationSuccessHandler() {
-		return new SavedRequestAwareAuthenticationSuccessHandler();
+		var successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+		// successHandler.setRequestCache(redisRequestCache());
+		return successHandler;
+	}
+
+	// @Bean
+	public RedisRequestCache redisRequestCache() {
+		return new RedisRequestCache();
+	}
+
+	// @Bean
+	public CookieRequestCache cookieRequestCache() {
+		return new CookieRequestCache();
 	}
 
 	// @Bean
@@ -194,7 +230,7 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		return registeredClientRepository;
 	}*/
 
-	@Bean
+	/*@Bean
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("messaging-client")
@@ -216,19 +252,48 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		// Save registered client in db as if in-memory
 		// var repository = new InMemoryRegisteredClientRepository(registeredClient);
 		return new InMemoryRegisteredClientRepository(registeredClient);
+	}*/
+
+	@Bean
+	public RegisteredClientRepository registeredClientRepository() {
+		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+				.clientId("messaging-client")
+				// .clientSecret("secret")
+				.clientSecret("$2a$10$Xt5ahdi2KFfptijeHvkyqe9LghZRuanSSQxfsJ.fzoCWM3gB72/kq")
+				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+				// .redirectUri("http://127.0.0.1:8080")
+				// .redirectUri("http://127.0.0.1:8080/authorized")
+				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/oauthServer")
+				.scope(OidcScopes.OPENID)
+				.scope("message.read")
+				.scope("message.write")
+				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+				.build();
+
+		// Save registered client in db as if in-memory
+		// var repository = new InMemoryRegisteredClientRepository(registeredClient);
+		var repository = new JdbcRegisteredClientRepository(jdbcTemplate);
+		// repository.save(registeredClient);
+		return repository;
 	}
 
 	// @formatter:on
 
 	@Bean
 	public OAuth2AuthorizationService authorizationService() {
-		var service = new InMemoryOAuth2AuthorizationService();
+		// var service = new InMemoryOAuth2AuthorizationService();
+		var service = new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository());
 		return service;
 	}
 
 	@Bean
 	public OAuth2AuthorizationConsentService authorizationConsentService() {
-		return new InMemoryOAuth2AuthorizationConsentService();
+		var consentService = new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository());
+		// return new InMemoryOAuth2AuthorizationConsentService();
+		return consentService;
 	}
 
 	@Bean

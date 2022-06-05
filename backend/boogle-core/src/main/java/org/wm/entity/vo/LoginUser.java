@@ -5,6 +5,9 @@ import java.util.Set;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +18,8 @@ import org.wm.entity.SysUser;
  * @创建时间 2022/1/25
  * @描述 登录用户身份权限
  */
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class LoginUser implements UserDetails {
     private static final long serialVersionUID = 1L;

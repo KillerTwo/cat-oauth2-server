@@ -113,7 +113,7 @@
             path: '/system/log/logininfor',
             component: './system/LoggingList/LoginLogList',
           },
-        ]
+        ],
       },
       {
         name: '任务调度',
@@ -125,7 +125,7 @@
         path: '/system/sysJobLog',
         component: './system/JobLogs',
       },
-    ]
+    ],
   },
   {
     path: '/tool',
@@ -140,8 +140,19 @@
         name: '系统接口',
         path: '/tool/swagger',
         component: './tool/SpringDoc',
-      }
-    ]
+      },
+    ],
+  },
+  {
+    path: '/oauth2',
+    name: '客户端管理',
+    routes: [
+      {
+        name: '客户端列表',
+        path: '/oauth2/clients',
+        component: './oauth2Server/client',
+      },
+    ],
   },
 
   {

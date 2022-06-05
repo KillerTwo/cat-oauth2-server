@@ -1,6 +1,7 @@
 package org.wm.config;
 
 import com.alibaba.fastjson2.support.spring.data.redis.FastJsonRedisSerializer;
+import com.alibaba.fastjson2.support.spring.data.redis.GenericFastJsonRedisSerializer;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,8 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setConnectionFactory(connectionFactory);
 
         // FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
-        var serializer = new FastJsonRedisSerializer<>(Object.class);
+        // var serializer = new FastJsonRedisSerializer<>(Object.class);
+        var serializer = new GenericFastJsonRedisSerializer();
 
         /*ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);

@@ -39,12 +39,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // LoginUser loginUser = tokenService.getLoginUser(request);
-        LoginUser loginUser = new LoginUser();
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        /*LoginUser loginUser = new LoginUser();
         var user = sysUserMapper.selectUserByUserName("admin");
         loginUser.setUser(user);
         var date = new Date(2022, 10, 10, 10, 10, 10);
-        loginUser.setExpireTime(date.getTime());
+        loginUser.setExpireTime(date.getTime());*/
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication())) {
             tokenService.verifyToken(loginUser);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());

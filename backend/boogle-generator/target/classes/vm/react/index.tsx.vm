@@ -128,7 +128,7 @@ const ${ClassName}List: React.FC = () => {
         setLoading(true);
         list${BusinessName}({ ...params }).then((res: ${moduleName}.ResponseResult) => {
             setLoading(false);
-            setData(res.rows);
+            setData(res.data);
         });
     };
 
@@ -161,14 +161,6 @@ const ${ClassName}List: React.FC = () => {
                     >
                         <EditOutlined />
                         修改
-                    </a>
-                    <a
-                        onClick={() => {
-                            handleModalVisible(true);
-                        }}
-                    >
-                        <PlusOutlined />
-                        新增
                     </a>
                     <Popconfirm
                         title="确定要删除${BusinessName}?"
@@ -262,6 +254,15 @@ const ${ClassName}List: React.FC = () => {
                         </Form.Item>
                     </Form>
                 </Card>
+                <Button
+                    type="primary"
+                    htmlType="button"
+                    onClick={() => {
+                        handleModalVisible(true);
+                    }}
+                >
+                    新增
+                </Button>
                 <Table
                     rowKey="${pkColumn.javaField}"
                     columns={columns}

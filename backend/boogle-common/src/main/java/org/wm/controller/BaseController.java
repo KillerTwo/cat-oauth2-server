@@ -58,6 +58,20 @@ public class BaseController {
         return PageResult.success(list, new PageInfo(list).getTotal());
     }
 
+    /**
+     * 响应请求分页数据
+     */
+    protected <T> PageResult<T> getDataTable(List<T> list, Long total) {
+        return PageResult.success(list, total);
+    }
+
+    /**
+     * 响应请求分页数据
+     */
+    protected <T> PageResult<T> getDataTable(List<T> list, List<?> data) {
+        return PageResult.success(list, new PageInfo(list).getTotal());
+    }
+
 
 
     /**
