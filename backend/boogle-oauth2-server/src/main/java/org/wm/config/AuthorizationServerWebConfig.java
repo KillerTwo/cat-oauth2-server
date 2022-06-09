@@ -28,37 +28,38 @@ import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.*;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
-import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
-import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.wm.authentication.filter.JwtAuthenticationTokenFilter;
 import org.wm.authentication.filter.OAuth2UsernameLoginFilter;
 import org.wm.authentication.handler.OAuth2LoginSuccessHandler;
+import org.wm.authentication.password.OAuth2AuthorizationPasswordRequestAuthenticationProvider;
+import org.wm.authentication.password.OAuth2PasswordAuthenticationConverter;
 import org.wm.jose.Jwks;
+import org.wm.utils.OAuth2ConfigurerUtils;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -71,9 +72,6 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -99,7 +97,22 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 //			var tokenType = context.getTokenType();
 //
 //		});
+		// 配置password授权模式
+		OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator = OAuth2ConfigurerUtils.getTokenGenerator(http);
+		authorizationServerConfigurer.tokenEndpoint(endpoint -> {
+			AuthenticationConverter authenticationConverter = new DelegatingAuthenticationConverter(
+					Arrays.asList(
+							new OAuth2AuthorizationCodeAuthenticationConverter(),
+							new OAuth2RefreshTokenAuthenticationConverter(),
+							new OAuth2ClientCredentialsAuthenticationConverter(),
+							new OAuth2PasswordAuthenticationConverter()));
 
+			endpoint.accessTokenRequestConverter(authenticationConverter);
+			// 该方法provider并不会被注册
+			endpoint.authenticationProvider(
+					new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
+							authorizationService(), tokenGenerator));
+		});
 
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer
 				.getEndpointsMatcher();
@@ -115,6 +128,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		/*http.sessionManagement(s -> {
 
 		});*/
+		http.authenticationProvider(new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
+				authorizationService(), tokenGenerator));
 
 		http.oauth2ResourceServer(oauth2Configurer ->
 				oauth2Configurer.jwt(jwtConfigurer -> jwtConfigurer.decoder(OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource()))));
@@ -191,6 +206,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		/*authorizationServerConfigurer
 				.authorizationEndpoint(authorizationEndpoint ->
 						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*/
+
+		// authorizationServerConfigurer.tokenGenerator(tokenGenerator);
 
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer
 				.getEndpointsMatcher();
