@@ -16,6 +16,9 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 import org.wm.properties.FileProperties;
 
 import java.nio.charset.StandardCharsets;
@@ -63,7 +66,19 @@ public class WebConfigurerAdapter implements WebMvcConfigurer {
         String pathUtl = "file:" + path.getPath().replace("\\","/");
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl);
         registry.addResourceHandler("/file/**").addResourceLocations(pathUtl);
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/");
+        // registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/");
+
+
+
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/")
+                .addResourceLocations("classpath:/resources/").addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/public/");
+
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/")
+                .resourceChain(false)
+                .addResolver(new WebJarsResourceResolver())
+                .addResolver(new PathResourceResolver());
         // registry.addResourceHandler("/css/**", "/js/**").addResourceLocations("classpath:/META-INF/resources/static/");
     }
 

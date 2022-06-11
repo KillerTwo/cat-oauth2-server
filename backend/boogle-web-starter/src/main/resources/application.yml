@@ -5,6 +5,7 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
+
 mybatis:
   typeAliasesPackage: org.wm.**.domain,org.wm.**.entity
   mapperLocations: classpath*:mapper/**/*Mapper.xml

@@ -1,155 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>login</title>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#712cf9">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>登录统一认证服务平台</title>
+    <meta name="description" content="统一认证服务平台">
+
     <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.css"
           th:href="@{/webjars/bootstrap/css/bootstrap.css}"/>
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
-        }
 
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
+    <link rel="stylesheet" href="/webjars/font-awesome/css/fontawesome.css"
+          th:href="@{/webjars/font-awesome/css/fontawesome.css}"/>
 
-        .b-example-divider {
-            height: 3rem;
-            background-color: rgba(0, 0, 0, .1);
-            border: solid rgba(0, 0, 0, .15);
-            border-width: 1px 0;
-            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
-        }
+    <link href="/css/style.min.css" rel="stylesheet"/>
+    <link href="../static/css/login.css" th:href="@{/css/login.min.css}" rel="stylesheet"/>
+    <link href="../static/css/web-ui.css" th:href="@{/css/web-ui.css}" rel="stylesheet"/>
 
-        .b-example-vr {
-            flex-shrink: 0;
-            width: 1.5rem;
-            height: 100vh;
-        }
-
-        .bi {
-            vertical-align: -.125em;
-            fill: currentColor;
-        }
-
-        .nav-scroller {
-            position: relative;
-            z-index: 2;
-            height: 2.75rem;
-            overflow-y: hidden;
-        }
-
-        .nav-scroller .nav {
-            display: flex;
-            flex-wrap: nowrap;
-            padding-bottom: 1rem;
-            margin-top: -1px;
-            overflow-x: auto;
-            text-align: center;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            display: flex;
-            align-items: center;
-            padding-top: 40px;
-            padding-bottom: 40px;
-            background-color: #f5f5f5;
-        }
-
-        .form-signin {
-            max-width: 330px;
-            padding: 15px;
-        }
-
-        .form-signin .form-floating:focus-within {
-            z-index: 2;
-        }
-
-        .form-signin input[type="email"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        .form-signin input[type="password"] {
-            margin-bottom: 10px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-    </style>
-    <!--<link th:href="@{/css/signin.css}" rel="stylesheet">-->
+    <!-- 360浏览器急速模式 -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" href="../static/favicon.ico" th:href="@{/favicon.ico}"/>
+    <style type="text/css">label.error { position:inherit;  }</style>
+    <!--<script>
+        if(window.top!==window.self){alert('未登录或登录超时。请重新登录');window.top.location=window.location};
+    </script>-->
 </head>
-<body class="text-center">
-<main class="form-signin w-100 m-auto">
-
-    <form id="loginForm" action="/oauth2/doLogin" method="post">
-        <img class="mb-4" th:src="@{/webjars/bootstrap-icons/icons/bootstrap-fill.svg}" alt="" width="72" height="57">
-        <h1 class="h3 mb-3 fw-normal">登录</h1>
-        <input type="hidden" name="uuid" id="uuid" value="">
-
-        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-        <div class="form-floating">
-            <input type="text" class="form-control" id="username" name="username" placeholder="name@example.com">
-            <label for="username">用户名</label>
+<body class="signin">
+    <div class="signinpanel">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="signin-info">
+                    <div class="logopanel m-b">
+                        <h1><img alt="[ 钦差 ]" src="../static/img/钦差logo.jpeg" th:src="@{/img/钦差logo.jpeg}"
+                                 style="width: 168px;height: 122px;"></h1>
+                    </div>
+                    <div class="m-b"></div>
+                    <h4>欢迎使用 <strong>统一认证服务平台</strong></h4>
+                    <ul class="m-b">
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> SpringBoot</li>
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Mybatis</li>
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Spring Security</li>
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Spring Authorization Server</li>
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> JWT</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <form id="signupForm" autocomplete="off" action="/oauth2/doLogin" method="post">
+                    <input type="hidden" name="uuid" id="uuid" value="">
+                    <h4 class="no-margins">登录：</h4>
+                    <p class="m-t-md">两袖清风存正气，五湖皓月照丹心</p>
+                    <p th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></p>
+                    <input type="text"     name="username" class="form-control uname"     placeholder="用户名" value="admin"    />
+                    <input type="password" name="password" class="form-control pword"     placeholder="密码"   value="admin123" />
+                    <!--th:if="${captchaEnabled==true}"-->
+					<div class="row m-t">
+						<div class="col-6">
+						    <input type="text" name="code" class="form-control code" placeholder="验证码" maxlength="5" />
+						</div>
+						<div class="col-6">
+							<a href="javascript:void(0);" title="点击更换验证码">
+								<!--<img th:src="@{/captchaImage(type=${captchaType})}" class="imgcode" width="85%"/>-->
+								<img class="imgcode" width="85%"/>
+							</a>
+						</div>
+					</div>
+                    <div class="checkbox-custom" th:if="${isRemembered}" th:classappend="${captchaEnabled==false} ? 'm-t'">
+				        <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>
+				    </div>
+                    <button class="btn btn-success btn-block" id="btnSubmit" data-loading="正在验证登录，请稍候...">登录</button>
+                </form>
+            </div>
         </div>
-        <div class="form-floating">
-            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-            <label for="password">密码</label>
+        <div class="signup-footer">
+            <div class="pull-left">
+                Copyright © 2022-2022 t All Rights Reserved. <br>
+            </div>
         </div>
-        <div class="form-floating input-group">
-            <input type="text" class="form-control" id="code" name="code">
-            <img src="" class="rounded mx-auto float-end input-group-text" id="captchaImg" style="cursor: pointer;width: 100px;" alt="...">
-            <label for="code">验证码</label>
-        </div>
-
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" value="remember-me"> 记住我
-            </label>
-        </div>
-        <button class="w-100 btn btn-lg btn-primary" id="submitBtn" type="submit">登录</button>
-        <p class="mt-5 mb-3 text-muted">&copy; 2022–2022</p>
-    </form>
-</main>
-
+    </div>
+<script th:inline="javascript"> var ctx = [[@{/}]]; var captchaType = [[${captchaType}]]; </script>
+<!--[if lte IE 8]><script>window.location.href=ctx+'html/ie.html';</script><![endif]-->
+<!-- 全局js -->
+<script src="/webjars/jquery/jquery.js" th:src="@{/webjars/jquery/jquery.js}"></script>
 <script src="/webjars/bootstrap/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-<script src="/webjars/whatwg-fetch/fetch.js" th:src="@{/webjars/whatwg-fetch/fetch.js}"></script>
-<script>
-    const img = document.getElementById("captchaImg");
-    function getCaptchaImage(img) {
-        fetch("/captchaImage")
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 200) {
-                    document.getElementById("uuid").value = data.data.uuid;
-                    const src = data.data.img;
-                    img.setAttribute("src", "data:image/jpg;base64," + src);
-                } else {
-
-                }
-            })
-    }
-    getCaptchaImage(img);
-
-    img.addEventListener('click', () => {
-        getCaptchaImage(img);
-    })
-</script>
+<script src="/webjars/jquery-blockui/jquery.blockUI.js" th:src="@{/webjars/jquery-blockui/jquery.blockUI.js}"></script>
+<script src="../static/js/validate/jquery.validate.min.js" th:src="@{/js/validate/jquery.validate.min.js}"></script>
+<script src="../static/js/layer/layer.min.js" th:src="@{/js/layer/layer.min.js}"></script>
+<script src="../static/js/login.js" th:src="@{/js/login.js}"></script>
 </body>
 </html>

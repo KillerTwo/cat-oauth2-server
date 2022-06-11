@@ -109,9 +109,9 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 
 			endpoint.accessTokenRequestConverter(authenticationConverter);
 			// 该方法provider并不会被注册
-			endpoint.authenticationProvider(
+			/*endpoint.authenticationProvider(
 					new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
-							authorizationService(), tokenGenerator));
+							authorizationService(), tokenGenerator));*/
 		});
 
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer
@@ -177,7 +177,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public SimpleUrlAuthenticationFailureHandler simpleUrlAuthenticationFailureHandler() {
 		var failureHandler = new SimpleUrlAuthenticationFailureHandler();
-		failureHandler.setDefaultFailureUrl("/oauth2/login?error=");
+		// failureHandler.setDefaultFailureUrl("/oauth2/login?error=");
+		failureHandler.setDefaultFailureUrl("/oauth2/login");
 		return failureHandler;
 	}
 

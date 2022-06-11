@@ -1,5 +1,5 @@
 <p align="center">
-	<img alt="logo" style="border-radius: 20px; width: 60px" src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/logo/6.jpg">
+	<img alt="logo" style="border-radius: 20px; width: 60px" src="https://img-we-master.oss-cn-chengdu.aliyuncs.com/logo/%E9%92%A6%E5%B7%AElogo.jpeg">
 </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">cat-oauth2-server v2022.05.22</h1>
 <h4 align="center">oauth2 统一认证服务平台</h4>
@@ -28,6 +28,13 @@ cat-oauth2-server是一套基于Spring boot、Spring security、Spring Authoriza
 2.  客户端凭据授权类型（client_credentials）
 3.  密码授权类型（password）
 4.  刷新令牌（refresh_token）
+
+## 默认端点
+
+1.  授权端点：/oauth2/authorize
+2.  token端点：/oauth2/token
+3.  token公钥端点：/oauth2/jwks
+4.  用户端点：/userinfo
 
 ## 在线体验
 

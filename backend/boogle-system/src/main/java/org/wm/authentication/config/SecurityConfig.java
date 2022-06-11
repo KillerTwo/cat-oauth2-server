@@ -106,6 +106,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.gif",
+                        "/**/*.ico",
                         "/profile/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.GET, // Swagger的资源路径需要允许访问

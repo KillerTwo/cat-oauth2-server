@@ -36,6 +36,7 @@
         <thymeleaf.starter.version>2.7.0</thymeleaf.starter.version>
         <fetch.version>3.6.2</fetch.version>
         <bootstrap-icons.version>1.8.2</bootstrap-icons.version>
+        <font-awesome.version>6.1.0</font-awesome.version>
     </properties>
 
 
@@ -250,6 +251,12 @@
                 <groupId>org.webjars.npm</groupId>
                 <artifactId>bootstrap-icons</artifactId>
                 <version>${bootstrap-icons.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>font-awesome</artifactId>
+                <version>${font-awesome.version}</version>
             </dependency>
 
 
