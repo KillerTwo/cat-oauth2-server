@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package org.wm.config;
 
 
@@ -62,10 +63,12 @@ import org.wm.utils.OAuth2ConfigurerUtils;
 import java.util.Arrays;
 import java.util.UUID;
 
+*/
 /**
  * @author Joe Grandja
  * @since 0.0.1
- */
+ *//*
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = true)
 public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
@@ -76,22 +79,26 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	/*@Bean
+	*/
+/*@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		http.oauth2ResourceServer(oauth2Configurer ->
 				oauth2Configurer.jwt(jwtConfigurer -> jwtConfigurer.decoder(OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource()))));
 		return http.formLogin(Customizer.withDefaults()).build();
-	}*/
+	}*//*
+
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer<>();
-		/*authorizationServerConfigurer
+		*/
+/*authorizationServerConfigurer
 				.authorizationEndpoint(authorizationEndpoint ->
-						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*/
+						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*//*
+
 
 //		authorizationServerConfigurer.tokenGenerator(context -> {
 //			var tokenType = context.getTokenType();
@@ -109,25 +116,33 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 
 			endpoint.accessTokenRequestConverter(authenticationConverter);
 			// 该方法provider并不会被注册
-			/*endpoint.authenticationProvider(
+			*/
+/*endpoint.authenticationProvider(
 					new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
-							authorizationService(), tokenGenerator));*/
+							authorizationService(), tokenGenerator));*//*
+
 		});
 
 		RequestMatcher endpointsMatcher = authorizationServerConfigurer
 				.getEndpointsMatcher();
 
-		/*http.requestCache(httpSecurityRequestCacheConfigurer -> {
+		*/
+/*http.requestCache(httpSecurityRequestCacheConfigurer -> {
 			httpSecurityRequestCacheConfigurer.requestCache(redisRequestCache());
-		});*/
+		});*//*
 
-		/*http.securityContext(s -> {
+
+		*/
+/*http.securityContext(s -> {
 			s.securityContextRepository()
-		});*/
+		});*//*
 
-		/*http.sessionManagement(s -> {
 
-		});*/
+		*/
+/*http.sessionManagement(s -> {
+
+		});*//*
+
 		http.authenticationProvider(new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
 				authorizationService(), tokenGenerator));
 
@@ -157,6 +172,7 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		return usernamePasswordAuthenticationFilter;
 	}
 
+	// 授权模式登录处理filter
 	@Bean
 	public OAuth2UsernameLoginFilter oAuth2UsernameLoginFilter() {
 		var oAuth2UsernameLoginFilter = new OAuth2UsernameLoginFilter();
@@ -204,9 +220,11 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer<>();
-		/*authorizationServerConfigurer
+		*/
+/*authorizationServerConfigurer
 				.authorizationEndpoint(authorizationEndpoint ->
-						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*/
+						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));*//*
+
 
 		// authorizationServerConfigurer.tokenGenerator(tokenGenerator);
 
@@ -224,7 +242,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	// @formatter:off
-	/*@Bean
+	*/
+/*@Bean
 	public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("messaging-client")
@@ -246,9 +265,11 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		registeredClientRepository.save(registeredClient);
 
 		return registeredClientRepository;
-	}*/
+	}*//*
 
-	/*@Bean
+
+	*/
+/*@Bean
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("messaging-client")
@@ -270,7 +291,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		// Save registered client in db as if in-memory
 		// var repository = new InMemoryRegisteredClientRepository(registeredClient);
 		return new InMemoryRegisteredClientRepository(registeredClient);
-	}*/
+	}*//*
+
 
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
@@ -284,7 +306,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				// .redirectUri("http://127.0.0.1:8080")
 				// .redirectUri("http://127.0.0.1:8080/authorized")
-				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/oauthServer")
+				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+				.redirectUri("http://127.0.0.1:8080/authorized")
 				.scope(OidcScopes.OPENID)
 				.scope("message.read")
 				.scope("message.write")
@@ -326,7 +349,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 		return ProviderSettings.builder().issuer("http://localhost:8001").oidcUserInfoEndpoint("/userinfo").build();
 	}
 
-	/*@Bean
+	*/
+/*@Bean
 	public EmbeddedDatabase embeddedDatabase() {
 		// @formatter:off
 		return new EmbeddedDatabaseBuilder()
@@ -338,6 +362,8 @@ public class AuthorizationServerWebConfig extends WebSecurityConfigurerAdapter {
 				.addScript("org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
 				.build();
 		// @formatter:on
-	}*/
+	}*//*
+
 
 }
+*/

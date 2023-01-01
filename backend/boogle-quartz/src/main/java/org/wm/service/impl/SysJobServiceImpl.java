@@ -16,7 +16,7 @@ import org.wm.service.ISysJobService;
 import org.wm.util.CronUtils;
 import org.wm.util.ScheduleUtils;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 
 /**

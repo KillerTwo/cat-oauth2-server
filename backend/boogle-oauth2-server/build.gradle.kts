@@ -16,6 +16,7 @@ dependencies {
     implementation("org.webjars:jquery:3.6.0")
     implementation("org.webjars:jquery-blockui:2.70-1")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    api("org.springframework.security:spring-security-oauth2-authorization-server:1.0.0")
 }
 
 description = "统一认证授权服务模块"

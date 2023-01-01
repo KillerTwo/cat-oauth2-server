@@ -31,7 +31,6 @@ import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2Au
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.util.StringUtils;
 
@@ -165,14 +164,14 @@ public final class OAuth2ConfigurerUtils {
 		return getOptionalBean(builder, type);
 	}
 
-	static <B extends HttpSecurityBuilder<B>> ProviderSettings getProviderSettings(B builder) {
+	/*static <B extends HttpSecurityBuilder<B>> ProviderSettings getProviderSettings(B builder) {
 		ProviderSettings providerSettings = builder.getSharedObject(ProviderSettings.class);
 		if (providerSettings == null) {
 			providerSettings = getBean(builder, ProviderSettings.class);
 			builder.setSharedObject(ProviderSettings.class, providerSettings);
 		}
 		return providerSettings;
-	}
+	}*/
 
 	static <B extends HttpSecurityBuilder<B>, T> T getBean(B builder, Class<T> type) {
 		return builder.getSharedObject(ApplicationContext.class).getBean(type);

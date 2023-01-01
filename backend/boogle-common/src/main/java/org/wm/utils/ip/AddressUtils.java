@@ -1,12 +1,15 @@
 package org.wm.utils.ip;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wm.constants.Constants;
+import org.wm.utils.ObjectMapperUtil;
 import org.wm.utils.StringUtils;
 import org.wm.utils.http.HttpUtils;
+
+import java.util.Map;
 
 
 /**
@@ -35,9 +38,10 @@ public class AddressUtils {
                     log.error("获取地理位置异常 {}", ip);
                     return UNKNOWN;
                 }
-                JSONObject obj = JSON.parseObject(rspStr);
-                String region = obj.getString("pro");
-                String city = obj.getString("city");
+                var obj = ObjectMapperUtil.readValue(rspStr, new TypeReference<Map<String, String>>() {
+                });
+                String region = obj.get("pro");
+                String city = obj.get("city");
                 return String.format("%s %s", region, city);
             } catch (Exception e) {
                 log.error("获取地理位置异常 {}", ip);
