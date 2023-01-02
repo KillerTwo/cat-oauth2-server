@@ -70,8 +70,7 @@ import java.util.UUID;
  * @author Joe Grandja
  * @since 0.0.1
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@Configuration(proxyBeanMethods = true)
+@Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 public class AuthorizationServerConfig {
 

@@ -30,7 +30,7 @@ import org.wm.authentication.handler.LogoutSuccessHandlerImpl;
  * @author ruoyi
  */
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @RequiredArgsConstructor
 // @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)

@@ -101,7 +101,7 @@ public class MyBatisConfig {
         typeAliasesPackage = setTypeAliasesPackage(typeAliasesPackage);
         VFS.addImplClass(SpringBootVFS.class);
 
-        final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setTypeAliasesPackage(typeAliasesPackage);
         sessionFactory.setMapperLocations(resolveMapperLocations(StringUtils.split(mapperLocations, ",")));
