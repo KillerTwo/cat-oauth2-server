@@ -27,11 +27,14 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
@@ -43,7 +46,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
@@ -54,7 +57,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.savedrequest.CookieRequestCache;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.wm.authentication.filter.OAuth2UsernameLoginFilter;
 import org.wm.authentication.handler.OAuth2LoginSuccessHandler;
@@ -70,7 +72,7 @@ import java.util.UUID;
  * @author Joe Grandja
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@Configuration(proxyBeanMethods = true)
 @RequiredArgsConstructor
 public class AuthorizationServerConfig {
 
@@ -86,6 +88,12 @@ public class AuthorizationServerConfig {
 		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer();
 
+		// 启用OpenID Connect 1.0， 默认是禁止的
+		authorizationServerConfigurer.oidc(Customizer.withDefaults());
+
+		/*http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+				.oidc(Customizer.withDefaults());*/
+
 		/*OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer<>();*/
 		/*authorizationServerConfigurer
@@ -99,6 +107,7 @@ public class AuthorizationServerConfig {
 		// 配置password授权模式
 		OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator = OAuth2ConfigurerUtils.getTokenGenerator(http);
 		authorizationServerConfigurer.tokenEndpoint(endpoint -> {
+
 			AuthenticationConverter authenticationConverter = new DelegatingAuthenticationConverter(
 					Arrays.asList(
 							new OAuth2AuthorizationCodeAuthenticationConverter(),
@@ -209,6 +218,7 @@ public class AuthorizationServerConfig {
 				.scope("message.read")
 				.scope("message.write")
 				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+				// .tokenSettings(TokenSettings.builder().build())
 				.build();
 
 		// Save registered client in db as if in-memory
@@ -234,6 +244,30 @@ public class AuthorizationServerConfig {
 		return consentService;
 	}
 
+	// token生成
+	// @Bean
+	public OAuth2TokenGenerator<?> tokenGenerator() {
+		JwtEncoder jwtEncoder = null;
+		JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
+		OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
+		accessTokenGenerator.setAccessTokenCustomizer(accessTokenCustomizer());
+		OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
+		return new DelegatingOAuth2TokenGenerator(
+				jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
+	}
+
+	// 自定义OAuth2Token属性
+	// @Bean
+	public OAuth2TokenCustomizer<OAuth2TokenClaimsContext> accessTokenCustomizer() {
+		return context -> {
+			OAuth2TokenClaimsSet.Builder claims = context.getClaims();
+			// Customize claims
+
+		};
+	}
+
+
+	// 用于签名访问令牌
 	@Bean
 	public JWKSource<SecurityContext> jwkSource() {
 		RSAKey rsaKey = Jwks.generateRsa();
@@ -241,9 +275,17 @@ public class AuthorizationServerConfig {
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
 
+	// 应用解密签名的访问令牌
+	// @Bean
+	public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+	}
+
 	@Bean
 	public AuthorizationServerSettings authorizationServerSettings() {
-		return AuthorizationServerSettings.builder().issuer("http://localhost:8001").oidcUserInfoEndpoint("/userinfo").build();
+		return AuthorizationServerSettings.builder().issuer("http://localhost:8001")
+				// .oidcUserInfoEndpoint("/userinfo")
+				.build();
 	}
 
 	/*@Bean

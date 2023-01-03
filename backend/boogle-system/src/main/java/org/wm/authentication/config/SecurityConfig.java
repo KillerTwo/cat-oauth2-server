@@ -103,15 +103,15 @@ public class SecurityConfig {
                         HttpMethod.GET,
                         "/",
                         "/*.html",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/**/*.png",
-                        "/**/*.jpg",
-                        "/**/*.jpeg",
-                        "/**/*.gif",
-                        "/**/*.ico",
-                        "/profile/**"
+                        "/*/*.html",
+                        "/*/*.css",
+                        "/*/*.js",
+                        "/*/*.png",
+                        "/*/*.jpg",
+                        "/*/*.jpeg",
+                        "/*/*.gif",
+                        "/*/*.ico",
+                        "/profile/*"
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET, // Swagger的资源路径需要允许访问
                         "/",
@@ -119,18 +119,18 @@ public class SecurityConfig {
                         "/swagger-ui/",
                         "/*.html",
                         "/favicon.ico",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/swagger-resources/**",
-                        "/v3/api-docs/**"
+                        "/*/*.html",
+                        "/*/*.css",
+                        "/*/*.js",
+                        "/swagger-resources/*",
+                        "/v3/api-docs/*"
                 )
                 .permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/webjars/**").permitAll()
+                .requestMatchers("/webjars/*").permitAll()
                 .requestMatchers("/*/api-docs").permitAll()
-                .requestMatchers("/druid/**").permitAll()
+                .requestMatchers("/druid/*").permitAll()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
@@ -138,6 +138,7 @@ public class SecurityConfig {
                 .headers().frameOptions().disable();
         httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);
         // 添加JWT filter
+        // httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
         // 添加CORS filter
         httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);

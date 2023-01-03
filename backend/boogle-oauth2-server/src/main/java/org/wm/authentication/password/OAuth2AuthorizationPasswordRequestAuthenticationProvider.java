@@ -162,7 +162,7 @@ public class OAuth2AuthorizationPasswordRequestAuthenticationProvider implements
             idToken = null;
         }
         var authorization = authorizationBuilder.build();
-        this.authorizationService.save(authorization);
+            this.authorizationService.save(authorization);
 
         Map<String, Object> additionalParameters = Collections.emptyMap();
         if (idToken != null) {
