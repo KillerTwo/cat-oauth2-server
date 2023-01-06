@@ -56,7 +56,10 @@ import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.wm.authentication.filter.OAuth2UsernameLoginFilter;
 import org.wm.authentication.handler.OAuth2LoginSuccessHandler;
@@ -87,6 +90,11 @@ public class AuthorizationServerConfig {
 
 		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer();
+
+		/*OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+
+		var authorizationServerConfigurer = http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);*/
+
 
 		// 启用OpenID Connect 1.0， 默认是禁止的
 		authorizationServerConfigurer.oidc(Customizer.withDefaults());
@@ -136,6 +144,13 @@ public class AuthorizationServerConfig {
 		/*http.sessionManagement(s -> {
 
 		});*/
+
+		HttpSessionSecurityContextRepository httpSessionSecurityContextRepository = new HttpSessionSecurityContextRepository();
+		http.securityContext((securityContext) -> securityContext
+						.securityContextRepository(httpSessionSecurityContextRepository)
+				// .requireExplicitSave(false)
+		);
+
 		http.authenticationProvider(new OAuth2AuthorizationPasswordRequestAuthenticationProvider(authenticationManager,
 				authorizationService(), tokenGenerator));
 
@@ -170,12 +185,20 @@ public class AuthorizationServerConfig {
 	// 授权模式登录处理filter
 	@Bean
 	public OAuth2UsernameLoginFilter oAuth2UsernameLoginFilter() {
+		HttpSessionSecurityContextRepository httpSessionSecurityContextRepository = new HttpSessionSecurityContextRepository();
 		var oAuth2UsernameLoginFilter = new OAuth2UsernameLoginFilter();
 		oAuth2UsernameLoginFilter.setFilterProcessesUrl("/oauth2/doLogin");
 		oAuth2UsernameLoginFilter.setAuthenticationManager(authenticationManager);
 		oAuth2UsernameLoginFilter.setAuthenticationSuccessHandler(oAuth2LoginSuccessHandler());
 		oAuth2UsernameLoginFilter.setAuthenticationFailureHandler(simpleUrlAuthenticationFailureHandler());
+		oAuth2UsernameLoginFilter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
+		oAuth2UsernameLoginFilter.setSecurityContextRepository(httpSessionSecurityContextRepository);
 		return oAuth2UsernameLoginFilter;
+	}
+
+	@Bean
+	public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+		return new SessionFixationProtectionStrategy();
 	}
 
 	@Bean

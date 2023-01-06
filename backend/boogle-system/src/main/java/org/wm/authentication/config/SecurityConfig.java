@@ -6,17 +6,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.wm.authentication.filter.JwtAuthenticationTokenFilter;
@@ -71,6 +75,29 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    @Bean
+    public WebSecurityCustomizer securityCustomizer() {
+        return web -> web.ignoring().requestMatchers(
+                HttpMethod.GET,
+                "/*.html",
+                "/*/*.html",
+                "/*/*.css",
+                "/*/*.js",
+                "/*/*.png",
+                "/*/*.jpg",
+                "/*/*.jpeg",
+                "/*/*.gif",
+                "/*/*.ico",
+                "/js/**",
+                "/profile/*",
+                "/swagger-ui.html",
+                "/swagger-ui/",
+                "/favicon.ico",
+                "/swagger-resources/**",
+                "/v3/api-docs/**"
+        );
+    }
+
     /**
      * anyRequest          |   匹配所有请求路径
      * access              |   SpringEl表达式结果为true时可以访问
@@ -88,7 +115,22 @@ public class SecurityConfig {
      */
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        /*HttpSessionRequestCache httpSessionRequestCache = new HttpSessionRequestCache();
+        httpSessionRequestCache.setMatchingRequestParameterName("continue");*/
+
+
+
         httpSecurity
+                /*.securityContext((securityContext) -> securityContext
+                        .securityContextRepository(httpSessionSecurityContextRepository)
+                        // .requireExplicitSave(false)
+                )*/
+                /*.securityContext((securityContext) -> securityContext
+                        .requireExplicitSave(true)
+                )
+                .requestCache((cache) -> cache
+                        .requestCache(httpSessionRequestCache)
+                )*/
                 // CSRF禁用，因为不使用session
                 .csrf().disable()
                 // 认证失败处理类
@@ -98,40 +140,13 @@ public class SecurityConfig {
                 // 过滤请求
                 .authorizeRequests()
                 // 对于登录login 注册register 验证码captchaImage 发送短信验证码captcha 重置密码resetPassword 允许匿名访问
-                .requestMatchers("/login", "/register", "/captchaImage", "/captcha", "/resetPassword", "/oauth2/login", "/oauth2/doLogin").permitAll()
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/",
-                        "/*.html",
-                        "/*/*.html",
-                        "/*/*.css",
-                        "/*/*.js",
-                        "/*/*.png",
-                        "/*/*.jpg",
-                        "/*/*.jpeg",
-                        "/*/*.gif",
-                        "/*/*.ico",
-                        "/profile/*"
-                ).permitAll()
-                .requestMatchers(HttpMethod.GET, // Swagger的资源路径需要允许访问
-                        "/",
-                        "/swagger-ui.html",
-                        "/swagger-ui/",
-                        "/*.html",
-                        "/favicon.ico",
-                        "/*/*.html",
-                        "/*/*.css",
-                        "/*/*.js",
-                        "/swagger-resources/*",
-                        "/v3/api-docs/*"
-                )
-                .permitAll()
+                .requestMatchers("/login", "/register", "/captchaImage", "/captcha",
+                        "/resetPassword", "/oauth2/login", "/oauth2/doLogin").permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-resources/**").permitAll()
-                .requestMatchers("/webjars/*").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
                 .requestMatchers("/*/api-docs").permitAll()
-                .requestMatchers("/druid/*").permitAll()
-
+                .requestMatchers("/druid/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
@@ -143,7 +158,6 @@ public class SecurityConfig {
         // 添加CORS filter
         httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
         httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
-        // httpSecurity.apply(authorizationServerWebConfig);
         httpSecurity.userDetailsService(userDetailsService);
 
         return httpSecurity.build();
