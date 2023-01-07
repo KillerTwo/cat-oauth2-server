@@ -4,8 +4,10 @@ package org.wm.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -17,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.servlet.resource.WebJarsResourceResolver;
+import org.wm.jks.JKSPathProperties;
+import org.wm.jks.RSAGenerator;
 import org.wm.properties.FileProperties;
 
 import java.nio.charset.StandardCharsets;
@@ -32,15 +36,16 @@ import java.util.List;
  * @date 2022-01-25
  */
 @Configuration
+@RequiredArgsConstructor
 // @EnableWebMvc
 public class WebConfigurerAdapter implements WebMvcConfigurer {
 
     /** 文件配置 */
     private final FileProperties properties;
 
-    public WebConfigurerAdapter(FileProperties properties) {
-        this.properties = properties;
-    }
+    private final JKSPathProperties jksPathProperties;
+
+
 
     @Bean
     public CorsFilter corsFilter() {
@@ -110,6 +115,13 @@ public class WebConfigurerAdapter implements WebMvcConfigurer {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper;
+    }
+
+    @Lazy()
+    @Bean
+    public RSAGenerator rsaGenerator() {
+        return RSAGenerator.getInstance(jksPathProperties.getPath(),
+                jksPathProperties.getAlias(), jksPathProperties.getPassword());
     }
 
 

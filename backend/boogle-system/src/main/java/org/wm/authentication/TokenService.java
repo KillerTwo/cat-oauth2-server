@@ -1,27 +1,32 @@
 package org.wm.authentication;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import jakarta.servlet.http.HttpServletRequest;
-
-
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.wm.constants.Constants;
 import org.wm.entity.vo.LoginUser;
 import org.wm.exception.ServiceException;
+import org.wm.jks.RSAGenerator;
+import org.wm.utils.ObjectMapperUtil;
 import org.wm.utils.RedisCache;
 import org.wm.utils.ServletUtils;
 import org.wm.utils.StringUtils;
 import org.wm.utils.ip.AddressUtils;
 import org.wm.utils.ip.IpUtils;
 import org.wm.utils.uuid.IdUtils;
+
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * token验证处理
@@ -49,6 +54,9 @@ public class TokenService {
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private RSAGenerator rsaGenerator;
+
     /**
      * 获取用户身份信息
      *
@@ -59,14 +67,14 @@ public class TokenService {
         String token = getToken(request);
         if (StringUtils.isNotEmpty(token)) {
             try {
-                Claims claims = parseToken(token);
+                JWTClaimsSet claims = parseToken(token);
                 // 解析对应的权限以及用户信息
-                String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+                String uuid = claims.getStringClaim(Constants.LOGIN_USER_KEY);
                 String userKey = getTokenKey(uuid);
-                // JSONObject object = redisCache.getCacheObject(userKey);
-                // String s = JSON.toJSONString(object);
-                LoginUser user = redisCache.getCacheObject(userKey);
-                // LoginUser user = JSON.parseObject(s, LoginUser.class);
+                var object = redisCache.getCacheObject(userKey);
+                String s = ObjectMapperUtil.writeValueAsString(object);
+                // LoginUser user = redisCache.getCacheObject(userKey);
+                LoginUser user = ObjectMapperUtil.readValue(s, LoginUser.class);
                 return user;
             } catch (Exception e) {
                 throw new ServiceException(e.getMessage());
@@ -105,10 +113,13 @@ public class TokenService {
         loginUser.setToken(token);
         setUserAgent(loginUser);
         refreshToken(loginUser);
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(Constants.LOGIN_USER_KEY, token);
-        return createToken(claims);
+        var second = LocalDateTime.now().plusMinutes(30).toEpochSecond(ZoneOffset.UTC);
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .subject("alice")
+                .expirationTime(new Date(second * 1000))
+                .claim(Constants.LOGIN_USER_KEY, token)
+                .build();
+        return createToken(claimsSet);
     }
 
     /**
@@ -158,11 +169,33 @@ public class TokenService {
      * @param claims 数据声明
      * @return 令牌
      */
-    private String createToken(Map<String, Object> claims) {
-        String token = Jwts.builder()
+    private String createToken(JWTClaimsSet claims) {
+        /*String token = Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
-        return token;
+                .signWith(SignatureAlgorithm.HS512, secret).compact();*/
+
+        var rsaJWK = rsaGenerator.getRsaKey();
+        try {
+            JWSSigner signer = new RSASSASigner(rsaJWK);
+
+
+            JWSHeader jwsHeader = new JWSHeader
+                    .Builder(JWSAlgorithm.RS256)    // 指定 RSA 算法
+                    .type(JOSEObjectType.JWT)
+                    .build();
+
+            SignedJWT signedJWT = new SignedJWT(
+                    jwsHeader,
+                    claims);
+
+            signedJWT.sign(signer);
+
+            String token = signedJWT.serialize();
+            return token;
+        } catch (JOSEException e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
     }
 
     /**
@@ -171,11 +204,23 @@ public class TokenService {
      * @param token 令牌
      * @return 数据声明
      */
-    private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+    private JWTClaimsSet parseToken(String token) {
+        try {
+            var decodeJWT = SignedJWT.parse(token);
+
+            var rsaJWK = rsaGenerator.getRsaKey();
+            var rsaPublicJWK = rsaJWK.toPublicJWK();
+
+            JWSVerifier verifier = new RSASSAVerifier(rsaPublicJWK);
+            if (decodeJWT.verify(verifier)) {
+                System.err.println(decodeJWT.getJWTClaimsSet());
+                return decodeJWT.getJWTClaimsSet();
+            }
+            return null;
+        } catch (ParseException | JOSEException e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
+        }
     }
 
     /**
@@ -185,7 +230,7 @@ public class TokenService {
      * @return 用户名
      */
     public String getUsernameFromToken(String token) {
-        Claims claims = parseToken(token);
+        var claims = parseToken(token);
         return claims.getSubject();
     }
 
